@@ -1,10 +1,10 @@
-﻿using apiProject.Entities;
+﻿
 using DocumentFormat.OpenXml.Bibliography;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Mvc;
-using OpenXmlPowerTools;
-using Court = apiProject.Entities.Court;
+using Solid.Service;
+
+using Court = Solid.Core.Entities.Court;
+
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -16,12 +16,16 @@ namespace apiProject.Controllers
     {
 
         static int count = 1;
-        private static List<Court> court = new List<Court> { new Court { Id = 0, Name = "בית המשפט השלום", City = "Jerosulem", operatingH = new DateTime(2023, 09, 19) } };
+        private readonly CourtService _courtService;
+        public CourtController(CourtService courtService)
+        {
+            _courtService = courtService;
+        }
         // GET: api/<ValuesController>
         [HttpGet]
-        public IEnumerable<Court> Get()
+        public ActionResult<Court> Get()
         {
-            return court;
+            return Ok(_courtService.GetCourts());
         }
 
         // GET api/<ValuesController>/5
@@ -36,14 +40,14 @@ namespace apiProject.Controllers
         [HttpPost]
         public void Post([FromBody] Court newCourt)
         {newCourt.Id = count++;
-            court.Add(newCourt);
+            _courtService.GetCourts().Add(newCourt);
         }
 
         // PUT api/<ValuesController>/5
         [HttpPut("{id}")]
         public ActionResult Put( [FromBody] Court newCourt)
         {
-            var f = court.Find(x => x.Id == newCourt.Id);
+            var f = _courtService.GetCourts().Find(x => x.Id == newCourt.Id);
             if (f == null)
                 return NotFound();
             f.City = newCourt.City;
@@ -58,10 +62,10 @@ namespace apiProject.Controllers
         [HttpDelete("{id}")]
         public ActionResult Delete(int id)
         {
-            var f = court.Find(x => x.Id == id);
+            var f = _courtService.GetCourts().Find(x => x.Id == id);
             if (f == null)
                 return NotFound();
-            court.Remove(f);
+            _courtService.GetCourts().Remove(f);
             return Ok(f);
         }
     }

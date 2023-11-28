@@ -1,4 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Solid.Service;
+
+using Goverment = Solid.Core.Entities.Goverment;
+
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -9,19 +13,24 @@ namespace apiProject.Controllers
     public class GovermentController : ControllerBase
     {
         static int count = 1;
-        static List<Goverment> goverment = new List<Goverment>{new Goverment {Id=0,Name="משה גפני",party="דגל התורה",IdParty=0 } };
+        private readonly GovermentService _GovermentService;
+        public GovermentController(GovermentService govermentService)
+        {
+            _GovermentService = govermentService;
+        }
+
         // GET: api/<ValuesController1>
         [HttpGet]
-        public IEnumerable<Goverment> Get()
+        public ActionResult<Goverment> Get()
         {
-            return goverment;
+            return  Ok(_GovermentService.GetGoverment()) ;
         }
 
         // GET api/<ValuesController1>/5
         [HttpGet("{id}")]
-        public ActionResult< Goverment>Get(int id)
+        public ActionResult<Goverment> Get(int id)
         {
-            var f = goverment.Find(x => x.Id == id);
+            var f = _GovermentService.GetGoverment().Find(x => x.Id == id);
             if (f == null)
                 return NotFound();
              return f;
@@ -32,14 +41,14 @@ namespace apiProject.Controllers
         public void Post([FromBody] Goverment newGoverment)
         {
             newGoverment.Id = count++;
-            goverment.Add(newGoverment);
+            _GovermentService.GetGoverment().Add(newGoverment);
         }
 
         // PUT api/<ValuesController1>/5
         [HttpPut("{id}")]
         public ActionResult Put( [FromBody] Goverment newGoverment)
         {
-            var f = goverment.Find(x => x.Id == newGoverment.Id);
+            var f = _GovermentService.GetGoverment().Find(x => x.Id == newGoverment.Id);
             if (f == null)
                 return NotFound();
             f.Name=newGoverment.Name;
@@ -52,10 +61,10 @@ namespace apiProject.Controllers
         [HttpDelete("{id}")]
         public ActionResult Delete(int id)
         {
-            var f = goverment.Find(x => x.Id ==id);
+            var f = _GovermentService.GetGoverment().Find(x => x.Id ==id);
             if (f == null)
                 return NotFound();
-           goverment.Remove(f);
+            _GovermentService.GetGoverment().Remove(f);
             return Ok();
         }
     }
